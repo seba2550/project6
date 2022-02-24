@@ -94,6 +94,7 @@ class BaseRegressor():
 class LogisticRegression(BaseRegressor):
     def __init__(self, num_feats, learning_rate=0.1, tol=0.0001, max_iter=100, batch_size=12):
         super().__init__(num_feats, learning_rate, tol, max_iter, batch_size)
+
         
     def calculate_gradient(self, X, y) -> np.ndarray:
         """
@@ -107,7 +108,13 @@ class LogisticRegression(BaseRegressor):
         Returns: 
             gradients for given loss function (np.ndarray)
         """
-        pass
+        n_samples = X.shape[0]
+        y_pred = self.make_prediction(X)
+        pred_error = y_pred - y
+        gradient = X.T.dot(pred_error)
+        return (1/n_samples) * gradient
+        
+        
     
     def loss_function(self, X, y) -> float:
         """
@@ -123,7 +130,11 @@ class LogisticRegression(BaseRegressor):
         Returns: 
             average loss 
         """
-        pass
+        y_pred = self.make_prediction(X) # Get our predictions
+        y_pred[y_pred == 0] = 0.0001 # Change 0s to a small non-zero value, and 1s to < 1 values to avoid runtime warnings (thank you Shiron and Grant for pointing this out on Slack)
+        y_pred[y_pred == 1] = 0.9999
+        return -np.mean(((1-y) * np.log(1 - y_pred)) + (y * np.log(y_pred))) # Binary cross-entropy
+
     
     def make_prediction(self, X) -> np.array:
         """
@@ -138,8 +149,13 @@ class LogisticRegression(BaseRegressor):
             y_pred for given X
         """
 
-        pass
+        lm = np.dot(X, self.W) # Standard linear model, we'll apply the sigmoid function to transform the output to 0s and 1s
+        y_predicted = self._sigmoid(lm)
+        return np.array(y_predicted) # Return the predictions
 
+    def _sigmoid(self, z): 
+        # Sigmoid function squashes us into 0, 1 range
+        return 1 / (1 + np.exp(-z))
 
 
     
