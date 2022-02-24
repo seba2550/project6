@@ -1,3 +1,5 @@
+![BuildStatus](https://github.com/seba2550/project6/actions/workflows/pytest.yml/badge.svg)
+
 # Project 6
 Logistic regression and application to medical record data
 
